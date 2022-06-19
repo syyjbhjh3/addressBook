@@ -31,6 +31,8 @@
 </body>
 
 <script>
+fn_selectList();
+
 var lastsel2;
 
 jQuery("#rowed5").jqGrid({
@@ -39,15 +41,32 @@ jQuery("#rowed5").jqGrid({
    	colNames:[ ' ','Name', 'Age', 'Phone Number'],
    	colModel:[
    		{name:'myac', width: 50, fixed:true, sortable : false, formatter:'actions', formatoptions:{keys:true, delbutton:true}},
-   		{name:'name',index:'name', width:150,editable: true,editoptions:{size:"20",maxlength:"30"}},
-   		{name:'age',index:'stock', width:60, editable: true,editoptions:{size:"20",maxlength:"30"}},
-   		{name:'phone_num',index:'ship', width:240, editable: true, editoptions:{size:"20",maxlength:"30"}}		
+   		{name:'name',index:'name', width:150, editable: true,editoptions:{size:"20",maxlength:"30"}},
+   		{name:'age',index:'age', width:60, editable: true,editoptions:{size:"20",maxlength:"30"}},
+   		{name:'phone_num',index:'phone_num', width:240, editable: true, editoptions:{size:"20",maxlength:"30"}}		
    	],
 	editurl: "server.php",
 	caption: "AddressBook"
 
 });
 
+
+function fn_selectList(){
+	 $.ajax({
+         type: "get",
+         url: "/address/search",
+         dataType: 'json',
+         success: function (data) {
+        	 $("#rowed5").jqGrid('setGridParam', { 
+        		   datatype: 'local',
+        		   data:data["data"]
+        		}).trigger("reloadGrid");
+         },
+         error: function (data) {
+         	alert(data["data"]);
+         }
+     });
+}
 
 $(function(){
     $('#submit').on("click",function () {
@@ -61,6 +80,7 @@ $(function(){
             dataType: 'json',
             success: function (data) {
             	alert(data["message"]);
+            	fn_selectList();
             },
             error: function (data) {
             	alert(data["message"]);
