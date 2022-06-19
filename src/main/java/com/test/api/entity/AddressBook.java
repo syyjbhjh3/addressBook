@@ -2,6 +2,7 @@ package com.test.api.entity;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.Table;
 
@@ -18,7 +19,7 @@ import lombok.NoArgsConstructor;
 @Table(name = "addressBook")
 public class AddressBook {
 	@Id
-	@Column(nullable = false, length = 3)
+	@GeneratedValue
     private Long no;
 	
 	@Column(nullable = false, length = 10)

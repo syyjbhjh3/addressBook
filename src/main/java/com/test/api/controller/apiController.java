@@ -1,13 +1,18 @@
 package com.test.api.controller;
 
+import java.util.List;
 import java.util.Map;
 
+import javax.servlet.http.HttpServletRequest;
+
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.ResponseBody;
 
+import com.test.api.entity.AddressBook;
 import com.test.api.mapping.Message;
 import com.test.api.mapping.Message.StatusEnum;
 import com.test.api.repo.AddressBookJpaRepo;
@@ -19,7 +24,7 @@ import lombok.RequiredArgsConstructor;
 
 @Api(tags = {"addreeBook"})
 @RequiredArgsConstructor
-@RestController
+@Controller
 @RequestMapping(value = "/address")
 public class apiController {
 	
@@ -31,28 +36,49 @@ public class apiController {
 		return "index";
 	}
 	
-	@ApiOperation(value = "등록", notes = "등록")
-	@GetMapping("/insert")
-	public Message insertAddressBook(@ApiParam(value = "등록", required = true) @RequestBody Map<String, String> param) throws Exception {
+	@ApiOperation(value = "조회", notes = "조회")
+	@GetMapping("/search")
+	public @ResponseBody Message searchAddressBook() throws Exception {
 		Message message = new Message();
+		
+		List<AddressBook> addressBook = repo.findAll();
 		message.setStatus(StatusEnum.OK);
-        message.setMessage("등록");
+        message.setMessage("저장성공");
+        message.setData(addressBook);
+		
         return message;
 	}
-
-	@ApiOperation(value = "수정", notes = "수정")
-	@GetMapping("/update")
-	public Message updateAddressBook(@ApiParam(value = "수정", required = true) @RequestBody Map<String, String> param) throws Exception {
+	
+	@ApiOperation(value = "저장", notes = "저장")
+	@GetMapping("/save")
+	public @ResponseBody Message saveAddressBook(@ApiParam(value = "저장", required = true) HttpServletRequest httpServletRequest) throws Exception {
 		Message message = new Message();
-		message.setStatus(StatusEnum.OK);
-        message.setMessage("수정");
-		return message;
+		;
+		try {
+			AddressBook addressBook = AddressBook.builder()
+									 .name(httpServletRequest.getParameter("name").toString())
+									 .age(Integer.parseInt(httpServletRequest.getParameter("age").toString()))
+									 .phone_num(httpServletRequest.getParameter("phone_num").toString())
+									 .build();		
+			repo.save(addressBook);
+			message.setStatus(StatusEnum.OK);
+	        message.setMessage("저장성공");
+		}catch (Exception e) {
+			message.setStatus(StatusEnum.INTERNAL_SERER_ERROR);
+	        message.setMessage("저장실패");
+	        
+	        e.printStackTrace();
+		}
+        return message;
 	}
 
 	@ApiOperation(value = "삭제", notes = "삭제")
 	@GetMapping("/delete")
-	public Message deleteAddressBook(@ApiParam(value = "삭제", required = true) @RequestBody Map<String, String> param) throws Exception {
+	public @ResponseBody Message deleteAddressBook(@ApiParam(value = "삭제", required = true) @RequestBody Map<String, String> param) throws Exception {
 		Message message = new Message();
+		
+		repo.deleteById(param.get("no").toString());
+		
 		message.setStatus(StatusEnum.OK);
         message.setMessage("삭제");
 		return message;
