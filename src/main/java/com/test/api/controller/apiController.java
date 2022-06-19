@@ -17,7 +17,7 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import lombok.RequiredArgsConstructor;
 
-@Api(tags = {"Order Processing"})
+@Api(tags = {"addreeBook"})
 @RequiredArgsConstructor
 @RestController
 @RequestMapping(value = "/address")
