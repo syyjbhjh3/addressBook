@@ -6,5 +6,5 @@ import org.springframework.stereotype.Repository;
 import com.test.api.entity.AddressBook;
 
 @Repository
-public interface AddressBookJpaRepo extends JpaRepository<AddressBook, String> {
+public interface AddressBookJpaRepo extends JpaRepository<AddressBook, Long> {
 }

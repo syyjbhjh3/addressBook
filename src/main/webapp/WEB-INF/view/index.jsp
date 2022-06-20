@@ -1,55 +1,83 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <!DOCTYPE html>
 <html>
-
-<!-- <link rel="stylesheet" type="text/css" media="screen" href="../resources/css/jquery-ui-1.10.4.custom.css" /> -->
-<link rel="stylesheet" type="text/css" media="screen" href="/css/ui.jqgrid.css" />
-<link rel="stylesheet" type="text/css" media="screen" href="/css/jquery-ui.css" />
-<link rel="stylesheet" type="text/css" media="screen" href="/css/jquery-ui.structure.css" />
-<link rel="stylesheet" type="text/css" media="screen" href="/css/jquery-ui.theme.min.css" />
-<link rel="stylesheet" type="text/css" media="screen" href="/css/master.css" />
-
-<script src="/js/jquery.js" type="text/javascript"></script>  
-<script src="/js/grid.locale-kr.js" type="text/javascript"></script>
-<script src="/js/jquery.jqGrid.min.js" type="text/javascript"></script>
-
 <head>
 <meta charset="UTF-8">
+<link rel="stylesheet" type="text/css" media="screen" href="/css/master.css" />
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+
 <title>Insert title here</title>
 </head>
 <body>
 	<div class="login">
-	  <h1>Infomation</h1>
+	  <h1>고리타분한 주소록</h1>
 	  <form method="get" action="" id="form">
-	    <p><input type="text" name="name" value="" placeholder="Name"></p>
-	    <p><input type="text" name="age" value="" placeholder="Age"></p>
-	    <p><input type="text" name="phone_num" value="" placeholder="Phone Number"></p>
-	    <p class="submit"><input type="button" id="submit" name="commit" value="Insert"></p>
+	    <p><input type="text" id="name" name="name" value="" placeholder="Name"></p>
+	    <p><input type="number" id="age" name="age" min="1" value="" placeholder="Age"></p>
+	    
+	    <p>
+	    	<input type="text" id="phone_num" name="phone_num" value="" maxlength='13' placeholder="Phone Number">
+	    	<input type="hidden" id="no" name="no">
+	    </p>
+	    
+	    <p class="submit">
+	    	<input type="button" class="btn" id="new" name="new" value="new">
+		    <input type="button" class="btn" id="save" name="save" value="save">
+		    <input type="button" class="btn" id="delete" name="delete" value="delete">
+	    </p>
 	  </form>
 	</div>
-   	<table id="rowed5"></table>
+	
+	<div class="list">
+		<ul class="list-group" id="list-group">
+		</ul>
+	</div>
 </body>
 
 <script>
 fn_selectList();
 
-var lastsel2;
+function fn_setFormData(no, name, age, phoneNum){
+	$('#name').val(name);
+	$('#age').val(age);
+	$('#phone_num').val(phoneNum);
+	$('#no').val(no);
+}
 
-jQuery("#rowed5").jqGrid({
-	datatype: "local",
-	height: 250,
-   	colNames:[ ' ','Name', 'Age', 'Phone Number'],
-   	colModel:[
-   		{name:'myac', width: 50, fixed:true, sortable : false, formatter:'actions', formatoptions:{keys:true, delbutton:true}},
-   		{name:'name',index:'name', width:150, editable: true,editoptions:{size:"20",maxlength:"30"}},
-   		{name:'age',index:'age', width:60, editable: true,editoptions:{size:"20",maxlength:"30"}},
-   		{name:'phone_num',index:'phone_num', width:240, editable: true, editoptions:{size:"20",maxlength:"30"}}		
-   	],
-	editurl: "server.php",
-	caption: "AddressBook"
+function fn_validate(){
+	if(!$('#name').val()){return false;}
+	if(!$('#age').val()){return false;}
+	if(!$('#phone_num').val()){return false;}
+	
+	return true;
+}
 
-});
-
+function fn_setList(list){
+	if(list.length == 0){
+		fn_setFormData('','','','');	
+	}
+	
+	$(list).each(function (i){
+		var addressBook = list[i];
+		
+		var html;
+	    if(i == 0){
+	    	html = "<li class='list-group-item active'> &nbsp;&nbsp;";
+	    	fn_setFormData(addressBook.no, addressBook.name, addressBook.age, addressBook.phone_num);
+	    }else{
+	    	html = "<li class='list-group-item'> &nbsp;&nbsp;";
+	    }
+	    html += "<h3 class='list-group-item-heading'>" + addressBook.name + "</h3>";
+	    html += "<p class='list-group-item-text'><span class='comp'>" + addressBook.phone_num + "</span><span class='badge badge-success float-right'>"+ addressBook.age +"</span></p>";
+	    html += "<span class='hiddenNo' hidden='hidden'>" + addressBook.no + "</span>";
+	    html += "</li>";
+		
+		$('#list-group').append(html);
+	});	
+}
 
 function fn_selectList(){
 	 $.ajax({
@@ -57,10 +85,8 @@ function fn_selectList(){
          url: "/address/search",
          dataType: 'json',
          success: function (data) {
-        	 $("#rowed5").jqGrid('setGridParam', { 
-        		   datatype: 'local',
-        		   data:data["data"]
-        		}).trigger("reloadGrid");
+        	 $('ul').empty();
+        	 fn_setList(data["data"]);
          },
          error: function (data) {
          	alert(data["data"]);
@@ -69,9 +95,19 @@ function fn_selectList(){
 }
 
 $(function(){
-    $('#submit').on("click",function () {
+    $('#new').on("click",function () {
+    	fn_setFormData('','','','');
+    });
+});
+
+$(function(){
+    $('#save').on("click",function () {
         var form = $("#form").serialize();
-        console.log(form);
+        
+        if(!fn_validate()){
+        	alert("입력정보 중 빈 값이 존재합니다.");	
+        	return false;
+        }
         
         $.ajax({
             type: "get",
@@ -89,5 +125,69 @@ $(function(){
     });
 });
 
+$(function(){
+    $('#delete').on("click",function () {
+    	var no = $('#no').val();
+    	
+    	var phone_num = $('.active').children('.list-group-item-text').children('.comp').text();
+    	var subPNum = phone_num.substring(0, 2); 
+    	
+    	if(no == null){
+    		alert("저장 후 삭제해주세요.");
+    		return false;
+    	}
+    	
+    	if(subPNum != "02"){
+    		alert("02로 시작하는 연락처만 삭제가능합니다.");
+    		return false;
+    	}
+    	
+        var form = $("#form").serialize();
+        
+        $.ajax({
+            type: "get",
+            url: "/address/delete",
+            data: form,
+            dataType: 'json',
+            success: function (data) {
+            	alert(data["message"]);
+            	fn_selectList();
+            },
+            error: function (data) {
+            	alert(data["message"]);
+            }
+        });
+    });
+});
+
+$(document).on("click", ".list-group li", function(){
+	$('.active').removeClass('active');
+	$(this).addClass('active');
+	
+	fn_setFormData($(this).children('.hiddenNo').text(), 
+				   $(this).children('.list-group-item-heading').text(), 
+			       $(this).children('.list-group-item-text').children('.badge').text(), 
+			       $(this).children('.list-group-item-text').children('.comp').text());
+});
+
+$(document).on("change", "input[name^=age]", function() {
+    var val= $(this).val();
+
+    if(val < 1 || val > 20) {
+        alert("1~20 범위로 입력해 주십시오.");
+        $(this).val('');
+        $(this).focus();
+    }
+});
+
+$(document).on("change", "input[name^=name]", function() {
+	var regexp = /[a-z0-9]|[ \[\]{}()<>?|`~!@#$%^&*-_+=,.;:\"'\\]/g;
+    var val = $(this).val();
+    if (regexp.test(val)) {
+        alert("한글만 입력가능 합니다.");
+        $(this).val(val.replace(regexp, ''));
+        $(this).focus();
+    }
+});
 </script>
 </html>
