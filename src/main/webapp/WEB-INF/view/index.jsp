@@ -8,8 +8,9 @@
 
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
 
-<title>Insert title here</title>
+<title>AddressBook</title>
 </head>
 <body>
 	<div class="login">
@@ -94,6 +95,13 @@ function fn_selectList(){
      });
 }
 
+function fn_alert(alert_icon, alert_title, alert_text){
+	Swal.fire({
+        icon: alert_icon,                
+        title: alert_title,    
+        text: alert_text,
+    });	
+}
 $(function(){
     $('#new').on("click",function () {
     	fn_setFormData('','','','');
@@ -105,7 +113,7 @@ $(function(){
         var form = $("#form").serialize();
         
         if(!fn_validate()){
-        	alert("입력정보 중 빈 값이 존재합니다.");	
+        	fn_alert('warning', '등록 / 수정','입력정보 중 빈 값이 존재합니다.');
         	return false;
         }
         
@@ -115,7 +123,7 @@ $(function(){
             data: form,
             dataType: 'json',
             success: function (data) {
-            	alert(data["message"]);
+            	fn_alert('success', '등록 / 수정',data["message"]);
             	fn_selectList();
             },
             error: function (data) {
@@ -133,12 +141,12 @@ $(function(){
     	var subPNum = phone_num.substring(0, 2); 
     	
     	if(no == null){
-    		alert("저장 후 삭제해주세요.");
+    		fn_alert('warning', '삭제', "저장 후 삭제해주세요.");
     		return false;
     	}
     	
     	if(subPNum != "02"){
-    		alert("02로 시작하는 연락처만 삭제가능합니다.");
+    		fn_alert('warning', '삭제', "02로 시작하는 연락처만 삭제가능합니다.");
     		return false;
     	}
     	
@@ -150,7 +158,7 @@ $(function(){
             data: form,
             dataType: 'json',
             success: function (data) {
-            	alert(data["message"]);
+            	fn_alert('success', '삭제', data["message"]);
             	fn_selectList();
             },
             error: function (data) {
@@ -174,7 +182,7 @@ $(document).on("change", "input[name^=age]", function() {
     var val= $(this).val();
 
     if(val < 1 || val > 20) {
-        alert("1~20 범위로 입력해 주십시오.");
+    	fn_alert('warning', '입력', "1~20 범위로 입력해 주십시오.");
         $(this).val('');
         $(this).focus();
     }
@@ -184,7 +192,7 @@ $(document).on("change", "input[name^=name]", function() {
 	var regexp = /[a-z0-9]|[ \[\]{}()<>?|`~!@#$%^&*-_+=,.;:\"'\\]/g;
     var val = $(this).val();
     if (regexp.test(val)) {
-        alert("한글만 입력가능 합니다.");
+    	fn_alert('warning', '입력', "한글만 입력가능 합니다.");
         $(this).val(val.replace(regexp, ''));
         $(this).focus();
     }
