@@ -53,8 +53,18 @@ public class apiController {
 	@GetMapping("/save")
 	public @ResponseBody Message saveAddressBook(@ApiParam(value = "저장", required = true) HttpServletRequest httpServletRequest) throws Exception {
 		Message message = new Message();
-		;
+		
 		try {
+			AddressBook addressBook = AddressBook.builder()
+									 .no(Long.parseLong(httpServletRequest.getParameter("no").toString()))
+									 .name(httpServletRequest.getParameter("name").toString())
+									 .age(Integer.parseInt(httpServletRequest.getParameter("age").toString()))
+									 .phone_num(httpServletRequest.getParameter("phone_num").toString())
+									 .build();		
+			repo.save(addressBook);
+			message.setStatus(StatusEnum.OK);
+	        message.setMessage("수정성공");
+		}catch (NumberFormatException e) { // No Null이라 error 발생시
 			AddressBook addressBook = AddressBook.builder()
 									 .name(httpServletRequest.getParameter("name").toString())
 									 .age(Integer.parseInt(httpServletRequest.getParameter("age").toString()))
@@ -62,7 +72,7 @@ public class apiController {
 									 .build();		
 			repo.save(addressBook);
 			message.setStatus(StatusEnum.OK);
-	        message.setMessage("저장성공");
+			message.setMessage("등록성공");
 		}catch (Exception e) {
 			message.setStatus(StatusEnum.INTERNAL_SERER_ERROR);
 	        message.setMessage("저장실패");
@@ -74,10 +84,10 @@ public class apiController {
 
 	@ApiOperation(value = "삭제", notes = "삭제")
 	@GetMapping("/delete")
-	public @ResponseBody Message deleteAddressBook(@ApiParam(value = "삭제", required = true) @RequestBody Map<String, String> param) throws Exception {
+	public @ResponseBody Message deleteAddressBook(@ApiParam(value = "삭제", required = true) HttpServletRequest httpServletRequest) throws Exception {
 		Message message = new Message();
 		
-		repo.deleteById(param.get("no").toString());
+		repo.deleteById(Long.parseLong(httpServletRequest.getParameter("no").toString()));
 		
 		message.setStatus(StatusEnum.OK);
         message.setMessage("삭제");
