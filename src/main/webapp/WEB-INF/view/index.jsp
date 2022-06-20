@@ -41,6 +41,7 @@
 <script>
 fn_selectList();
 
+/* Form Date Reset  */
 function fn_setFormData(no, name, age, phoneNum){
 	$('#name').val(name);
 	$('#age').val(age);
@@ -48,6 +49,7 @@ function fn_setFormData(no, name, age, phoneNum){
 	$('#no').val(no);
 }
 
+/* Insert,Update Check Validate  */
 function fn_validate(){
 	if(!$('#name').val()){return false;}
 	if(!$('#age').val()){return false;}
@@ -56,6 +58,7 @@ function fn_validate(){
 	return true;
 }
 
+/* Make ListGroup */
 function fn_setList(list){
 	if(list.length == 0){
 		fn_setFormData('','','','');	
@@ -80,6 +83,7 @@ function fn_setList(list){
 	});	
 }
 
+/* Search List */
 function fn_selectList(){
 	 $.ajax({
          type: "get",
@@ -95,6 +99,7 @@ function fn_selectList(){
      });
 }
 
+/* SweetAlert2 Function */
 function fn_alert(alert_icon, alert_title, alert_text){
 	Swal.fire({
         icon: alert_icon,                
@@ -102,6 +107,8 @@ function fn_alert(alert_icon, alert_title, alert_text){
         text: alert_text,
     });	
 }
+
+/* Button Click Event */
 $(function(){
     $('#new').on("click",function () {
     	fn_setFormData('','','','');
@@ -178,6 +185,7 @@ $(document).on("click", ".list-group li", function(){
 			       $(this).children('.list-group-item-text').children('.comp').text());
 });
 
+/* Input Validation Event */
 $(document).on("change", "input[name^=age]", function() {
     var val= $(this).val();
 
