@@ -1,6 +1,5 @@
-# 고리타분한 주소록
+# 주소록
 
-##### 지원자 박영준
 ##### 사용기술 : Java 11, Spring Boot 3.6.7, JPA, SQLite, Gradle, Jsp, JQuery
 ##### 접속 url : http://localhost:8080/address/
 
